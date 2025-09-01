@@ -205,8 +205,10 @@ export default function NetSheet() {
               fileName={`Net-Sheet-${salePrice}.pdf`}
               className="btn btn-primary"
             >
-              {({ loading }) => (
-                <span>{loading ? 'Preparing PDF…' : 'Download PDF'}</span>
+              {({ loading }: { loading: boolean }) => (
+                <>
+                  {loading ? 'Preparing PDF…' : 'Download PDF'}
+                </>
               )}
             </PDFDownloadLink>
           </div>
