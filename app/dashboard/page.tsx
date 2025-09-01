@@ -1,58 +1,66 @@
+// app/dashboard/page.tsx
 import PortfolioOverview from '@/components/portfoliooverview'
 import StatCard from '@/components/statcard'
 import PropertyCard from '@/components/propertycard'
 import RecentSalesTable from '@/components/recentsalestable'
 import { sbServer } from '@/lib/server_supabase'
 
-export const revalidate = 30
-
 export default async function DashboardPage() {
-  const sb = sbServer()
-
-  const { data: props } = await sb
+  const { data: properties } = await sbServer
     .from('properties')
     .select('*')
-    .order('created_at', { ascending: false })
+    .order('id')
 
-  const { data: sales } = await sb
+  const { data: sales } = await sbServer
     .from('sales')
     .select('*')
-    .order('sale_date', { ascending: false })
-    .limit(8)
-
-  const totals = (props ?? []).reduce(
-    (acc: any, p: any) => {
-      acc.totalValue += Number(p.current_value || 0)
-      acc.totalBasis += Number(p.purchase_price || 0)
-      return acc
-    },
-    { totalValue: 0, totalBasis: 0 }
-  )
+    .order('id')
 
   return (
-    <div className="space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold text-brand-navy">SCOTTSDALE Luxury Seller Blueprint</h1>
-        <p className="text-gray-600">Track your real estate portfolio and market insights.</p>
+    <div className="space-y-6">
+      {/* Header with Add Property button */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-brand-navy">
+            SCOTTSDALE Luxury Seller Blueprint
+          </h1>
+          <p className="text-gray-600">
+            Track your real estate portfolio and market insights.
+          </p>
+        </div>
+        <a
+          href="/dashboard/add"
+          className="px-4 py-2 rounded-xl bg-brand-gold text-white font-medium hover:bg-yellow-600 transition"
+        >
+          + Add Property
+        </a>
       </div>
 
-      <PortfolioOverview totals={totals} />
+      {/* Portfolio Overview */}
+      <PortfolioOverview />
 
-      <section className="grid md:grid-cols-4 gap-4">
-        <StatCard label="Avg. Sale Price" value="$1,950,000" sub="Market data" />
-        <StatCard label="Price per Sq Ft" value="$872" sub="Market data" />
-        <StatCard label="Avg. Days on Market" value="23 days" sub="Market data" />
-        <StatCard label="Recent Sales" value={(sales?.length ?? 0).toString()} sub="Market data" />
-      </section>
+      {/* Market Statistics */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <StatCard title="Avg. Sale Price" value="$1,950,000" />
+        <StatCard title="Price per Sq Ft" value="$872" />
+        <StatCard title="Avg. Days on Market" value="23 days" />
+        <StatCard title="Recent Sales" value={sales?.length || 0} />
+      </div>
 
-      <section>
-        <h3 className="text-lg font-semibold mb-3">Your Properties</h3>
-        <div className="grid md:grid-cols-2 gap-4">
-          {(props ?? []).map((p: any) => <PropertyCard key={p.id} p={p} />)}
+      {/* Your Properties */}
+      <div>
+        <h2 className="text-2xl font-bold text-brand-navy mb-4">
+          Your Properties
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {properties?.map((p) => (
+            <PropertyCard key={p.id} property={p} />
+          ))}
         </div>
-      </section>
+      </div>
 
-      <RecentSalesTable data={(sales ?? []) as any} />
+      {/* Recent Sales */}
+      <RecentSalesTable sales={sales || []} />
     </div>
   )
 }
