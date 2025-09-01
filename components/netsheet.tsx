@@ -2,6 +2,8 @@
 import { useMemo, useState } from 'react'
 import CommissionScenarios from '@/components/commissionscenarios'
 import { computeNet } from '@/lib/calc'
+import { PDFDownloadLink } from '@react-pdf/renderer'
+import NetSheetPDF from '@/components/pdf/netsheet-pdf'
 
 export default function NetSheet() {
   const [salePrice, setSalePrice] = useState(1_000_000)
@@ -182,6 +184,29 @@ export default function NetSheet() {
             <div className="text-right">
               ${result.breakdown.totalClosing.toLocaleString()}
             </div>
+          </div>
+
+          {/* Download PDF button */}
+          <div className="mt-4">
+            <PDFDownloadLink
+              document={
+                <NetSheetPDF
+                  salePrice={salePrice}
+                  loanPayoff={loanPayoff}
+                  commissionRate={commission}
+                  breakdown={{
+                    commission: result.breakdown.commission,
+                    totalClosing: result.breakdown.totalClosing,
+                    loanPayoff: result.breakdown.loanPayoff
+                  }}
+                  net={result.net}
+                />
+              }
+              fileName={`Net-Sheet-${salePrice}.pdf`}
+              className="btn btn-primary"
+            >
+              {({ loading }) => (loading ? 'Preparing PDF…' : 'Download PDF')}
+            </PDFDownloadLink>
           </div>
         </div>
 
