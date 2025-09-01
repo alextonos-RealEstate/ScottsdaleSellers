@@ -2,7 +2,7 @@
 import { useMemo, useState } from 'react'
 import CommissionScenarios from '@/components/commissionscenarios'
 import { computeNet } from '@/lib/calc'
-import { PDFDownloadLink } from '@react-pdf/renderer'
+import PDFDownloadLink from '@/components/pdf/pdfdownload'
 import NetSheetPDF from '@/components/pdf/netsheet-pdf'
 
 export default function NetSheet() {
