@@ -4,6 +4,7 @@ import CommissionScenarios from '@/components/commissionscenarios'
 import { computeNet } from '@/lib/calc'
 import PDFDownloadLink from '@/components/pdf/pdfdownload'
 import NetSheetPDF from '@/components/pdf/netsheet-pdf'
+import React from 'react'
 
 export default function NetSheet() {
   const [salePrice, setSalePrice] = useState(1_000_000)
@@ -205,11 +206,9 @@ export default function NetSheet() {
               fileName={`Net-Sheet-${salePrice}.pdf`}
               className="btn btn-primary"
             >
-              {({ loading }: { loading: boolean }) => (
-                <>
-                  {loading ? 'Preparing PDF…' : 'Download PDF'}
-                </>
-              )}
+              {({ loading }: { loading: boolean }) =>
+                (loading ? 'Preparing PDF…' : 'Download PDF') as React.ReactNode
+              }
             </PDFDownloadLink>
           </div>
         </div>
