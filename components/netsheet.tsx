@@ -1,10 +1,9 @@
 'use client'
-import { useMemo, useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import CommissionScenarios from '@/components/commissionscenarios'
 import { computeNet } from '@/lib/calc'
 import PDFDownloadLink from '@/components/pdf/pdfdownload'
 import NetSheetPDF from '@/components/pdf/netsheet-pdf'
-import React from 'react'
 
 export default function NetSheet() {
   const [salePrice, setSalePrice] = useState(1_000_000)
@@ -187,7 +186,7 @@ export default function NetSheet() {
             </div>
           </div>
 
-          {/* Download PDF button */}
+          {/* Download PDF button (plain child to satisfy TS) */}
           <div className="mt-4">
             <PDFDownloadLink
               document={
@@ -206,9 +205,7 @@ export default function NetSheet() {
               fileName={`Net-Sheet-${salePrice}.pdf`}
               className="btn btn-primary"
             >
-              {({ loading }: { loading: boolean }) =>
-                (loading ? 'Preparing PDF…' : 'Download PDF') as React.ReactNode
-              }
+              Download PDF
             </PDFDownloadLink>
           </div>
         </div>
