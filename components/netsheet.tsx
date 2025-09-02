@@ -1,5 +1,5 @@
 'use client'
-import React, { useMemo, useState } from 'react'
+import React, { useMemo, useState, useEffect } from 'react'
 import CommissionScenarios from '@/components/commissionscenarios'
 import { computeNet } from '@/lib/calc'
 import PDFDownloadLink from '@/components/pdf/pdfdownload'
@@ -17,6 +17,10 @@ export default function NetSheet() {
     sellerCredits: 0,
     otherFees: 0
   })
+
+  // ✅ only render PDFDownloadLink on client
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => setMounted(true), [])
 
   const result = useMemo(
     () => computeNet({ salePrice, loanPayoff, commissionRate: commission, costs }),
@@ -186,27 +190,29 @@ export default function NetSheet() {
             </div>
           </div>
 
-          {/* Download PDF button (plain child, no render-prop) */}
+          {/* ✅ Only render PDFDownloadLink after mounted */}
           <div className="mt-4">
-            <PDFDownloadLink
-              document={
-                <NetSheetPDF
-                  salePrice={salePrice}
-                  loanPayoff={loanPayoff}
-                  commissionRate={commission}
-                  breakdown={{
-                    commission: result.breakdown.commission,
-                    totalClosing: result.breakdown.totalClosing,
-                    loanPayoff: result.breakdown.loanPayoff
-                  }}
-                  net={result.net}
-                />
-              }
-              fileName={`Net-Sheet-${salePrice}.pdf`}
-              className="btn btn-primary"
-            >
-              Download PDF
-            </PDFDownloadLink>
+            {mounted && (
+              <PDFDownloadLink
+                document={
+                  <NetSheetPDF
+                    salePrice={salePrice}
+                    loanPayoff={loanPayoff}
+                    commissionRate={commission}
+                    breakdown={{
+                      commission: result.breakdown.commission,
+                      totalClosing: result.breakdown.totalClosing,
+                      loanPayoff: result.breakdown.loanPayoff
+                    }}
+                    net={result.net}
+                  />
+                }
+                fileName={`Net-Sheet-${salePrice}.pdf`}
+                className="btn btn-primary"
+              >
+                Download PDF
+              </PDFDownloadLink>
+            )}
           </div>
         </div>
 
