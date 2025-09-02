@@ -10,17 +10,17 @@ export const revalidate = 0
 export async function POST(req: Request) {
   // Create the client at REQUEST TIME (not module top), so it doesn't run during build
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const serviceRole = process.env.SUPABASE_SERVICE_ROLE
+  const serviceKey = process.env.SUPABASE_SERVICE_KEY
 
-  if (!url || !serviceRole) {
+  if (!url || !serviceKey) {
     // Be explicit so we know which variable is missing if this ever happens in runtime
     return NextResponse.json(
-      { error: `Missing env: ${!url ? 'NEXT_PUBLIC_SUPABASE_URL' : ''} ${!serviceRole ? 'SUPABASE_SERVICE_ROLE' : ''}`.trim() },
+      { error: `Missing env: ${!url ? 'NEXT_PUBLIC_SUPABASE_URL' : ''} ${!serviceKey ? 'SUPABASE_SERVICE_KEY' : ''}`.trim() },
       { status: 500 }
     )
   }
 
-  const supabase = createClient(url, serviceRole, {
+  const supabase = createClient(url, serviceKey, {
     auth: { persistSession: false, autoRefreshToken: false }
   })
 
