@@ -1,18 +1,32 @@
+// app/api/properties/route.ts
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL as string,
-  // service role is safe here (server-only file)
-  process.env.SUPABASE_SERVICE_ROLE as string,
-  { auth: { persistSession: false, autoRefreshToken: false } }
-)
+// Ensure this API route is not statically analyzed/prerendered
+export const runtime = 'nodejs'
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
 
 export async function POST(req: Request) {
+  // Create the client at REQUEST TIME (not module top), so it doesn't run during build
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const serviceRole = process.env.SUPABASE_SERVICE_ROLE
+
+  if (!url || !serviceRole) {
+    // Be explicit so we know which variable is missing if this ever happens in runtime
+    return NextResponse.json(
+      { error: `Missing env: ${!url ? 'NEXT_PUBLIC_SUPABASE_URL' : ''} ${!serviceRole ? 'SUPABASE_SERVICE_ROLE' : ''}`.trim() },
+      { status: 500 }
+    )
+  }
+
+  const supabase = createClient(url, serviceRole, {
+    auth: { persistSession: false, autoRefreshToken: false }
+  })
+
   try {
     const body = await req.json()
 
-    // basic validation
     const {
       full_address,
       address_line1,
