@@ -43,7 +43,7 @@ export default function NetSheet() {
               <input
                 className="mt-1 w-full border rounded-lg px-3 py-2"
                 type="number"
-                value={loanPayoff}
+                value={salePrice > 0 ? loanPayoff : 0}
                 onChange={(e) => setLoanPayoff(Number(e.target.value))}
               />
             </label>
@@ -186,7 +186,7 @@ export default function NetSheet() {
             </div>
           </div>
 
-          {/* Download PDF button (plain child to satisfy TS) */}
+          {/* Download PDF button (plain child, no render-prop) */}
           <div className="mt-4">
             <PDFDownloadLink
               document={
