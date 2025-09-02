@@ -1,9 +1,7 @@
 'use client'
-import React, { useMemo, useState, useEffect } from 'react'
+import React, { useMemo, useState } from 'react'
 import CommissionScenarios from '@/components/commissionscenarios'
 import { computeNet } from '@/lib/calc'
-import PDFDownloadLink from '@/components/pdf/pdfdownload'
-import NetSheetPDF from '@/components/pdf/netsheet-pdf'
 
 export default function NetSheet() {
   const [salePrice, setSalePrice] = useState(1_000_000)
@@ -17,10 +15,6 @@ export default function NetSheet() {
     sellerCredits: 0,
     otherFees: 0
   })
-
-  // ✅ only render PDFDownloadLink on client
-  const [mounted, setMounted] = useState(false)
-  useEffect(() => setMounted(true), [])
 
   const result = useMemo(
     () => computeNet({ salePrice, loanPayoff, commissionRate: commission, costs }),
@@ -188,31 +182,6 @@ export default function NetSheet() {
             <div className="text-right">
               ${result.breakdown.totalClosing.toLocaleString()}
             </div>
-          </div>
-
-          {/* ✅ Only render PDFDownloadLink after mounted */}
-          <div className="mt-4">
-            {mounted && (
-              <PDFDownloadLink
-                document={
-                  <NetSheetPDF
-                    salePrice={salePrice}
-                    loanPayoff={loanPayoff}
-                    commissionRate={commission}
-                    breakdown={{
-                      commission: result.breakdown.commission,
-                      totalClosing: result.breakdown.totalClosing,
-                      loanPayoff: result.breakdown.loanPayoff
-                    }}
-                    net={result.net}
-                  />
-                }
-                fileName={`Net-Sheet-${salePrice}.pdf`}
-                className="btn btn-primary"
-              >
-                Download PDF
-              </PDFDownloadLink>
-            )}
           </div>
         </div>
 
