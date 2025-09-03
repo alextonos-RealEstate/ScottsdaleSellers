@@ -24,7 +24,7 @@ export default function PropertyList() {
         const res = await fetch('/api/properties/recent', { cache: 'no-store' })
         const json = await res.json()
         if (!res.ok) throw new Error(json?.error || 'Failed to load properties')
-        setRows(json.properties)
+        setRows(json.properties ?? [])
       } catch (e: any) {
         setErr(e.message)
       } finally {
@@ -38,8 +38,8 @@ export default function PropertyList() {
   if (rows.length === 0) {
     return (
       <div className="card p-6">
-        No properties yet. Add one on the{' '}
-        <a className="underline" href="/add">Add Property</a> page.
+        <div className="mb-2">No properties yet.</div>
+        <a className="btn btn-primary" href="/add">Add Property</a>
       </div>
     )
   }
@@ -50,33 +50,34 @@ export default function PropertyList() {
         <h3 className="text-lg font-semibold">Recent Properties</h3>
         <a href="/add" className="btn btn-primary">Add Property</a>
       </div>
-      <div className="mt-4 overflow-x-auto">
-        <table className="min-w-full text-sm">
-          <thead className="text-left text-gray-500">
-            <tr>
-              <th className="py-2 pr-4">Address</th>
-              <th className="py-2 pr-4">Owner</th>
-              <th className="py-2 pr-4">Email</th>
-              <th className="py-2 pr-4">Created</th>
-              <th className="py-2 pr-4"></th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((p) => (
-              <tr key={p.id} className="border-t">
-                <td className="py-2 pr-4">{p.full_address || '—'}</td>
-                <td className="py-2 pr-4">{p.owner_name || '—'}</td>
-                <td className="py-2 pr-4">{p.owner_email || '—'}</td>
-                <td className="py-2 pr-4">{new Date(p.created_at).toLocaleDateString()}</td>
-                <td className="py-2 pr-4">
-                  <a className="text-brand-navy underline" href={`/property/${p.id}`}>Open</a>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+
+      <div className="mt-4 space-y-3">
+        {rows.map((p) => (
+          <div key={p.id} className="border rounded-xl p-4 flex items-center justify-between">
+            <div className="text-sm">
+              <div className="font-medium">{p.full_address || '—'}</div>
+              <div className="text-gray-500">
+                {(p.city || '—')}, {(p.state || '—')} {p.postal_code || ''}
+              </div>
+              <div className="text-gray-500">
+                {p.owner_name || '—'} · {p.owner_email || '—'}
+              </div>
+              <div className="text-gray-400">
+                Added {new Date(p.created_at).toLocaleDateString()}
+              </div>
+            </div>
+
+            {/* 🔥 Big, obvious Open button */}
+            <a
+              href={`/property/${p.id}`}
+              className="btn btn-secondary"
+              aria-label={`Open property ${p.full_address || p.id}`}
+            >
+              Open
+            </a>
+          </div>
+        ))}
       </div>
     </div>
   )
 }
-
