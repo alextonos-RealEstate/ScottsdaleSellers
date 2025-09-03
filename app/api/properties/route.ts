@@ -10,17 +10,17 @@ export const revalidate = 0
 export async function POST(req: Request) {
   // Create the client at REQUEST TIME (not module top), so it doesn't run during build
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const serviceRole = process.env.SUPABASE_SERVICE_ROLE
+  const serviceKey = process.env.SUPABASE_SERVICE_KEY
 
-  if (!url || !serviceRole) {
+  if (!url || !serviceKey) {
     // Be explicit so we know which variable is missing if this ever happens in runtime
     return NextResponse.json(
-      { error: `Missing env: ${!url ? 'NEXT_PUBLIC_SUPABASE_URL' : ''} ${!serviceRole ? 'SUPABASE_SERVICE_ROLE' : ''}`.trim() },
+      { error: `Missing env: ${!url ? 'NEXT_PUBLIC_SUPABASE_URL' : ''} ${!serviceKey ? 'SUPABASE_SERVICE_KEY' : ''}`.trim() },
       { status: 500 }
     )
   }
 
-  const supabase = createClient(url, serviceRole, {
+  const supabase = createClient(url, serviceKey, {
     auth: { persistSession: false, autoRefreshToken: false }
   })
 
@@ -29,37 +29,50 @@ export async function POST(req: Request) {
 
     const {
       full_address,
-      address_line1,
-      address_line2,
+      address,
       city,
       state = 'AZ',
       postal_code,
+      zip,
+      type,
+      beds,
+      baths,
+      sqft,
+      purchase_price,
+      purchase_date,
+      current_value,
       lat,
-      lng,
-      owner_name,
-      owner_email
+      lng
     } = body || {}
 
-    if (!full_address) {
-      return NextResponse.json({ error: 'full_address is required' }, { status: 400 })
+    const addressValue = full_address || address
+    const zipValue = postal_code || zip
+
+    if (!addressValue) {
+      return NextResponse.json({ error: 'address is required' }, { status: 400 })
     }
+
+    const insertPayload = Object.fromEntries(
+      Object.entries({
+        address: addressValue,
+        city,
+        state,
+        zip: zipValue,
+        type,
+        beds,
+        baths,
+        sqft,
+        purchase_price,
+        purchase_date,
+        current_value,
+        lat,
+        lng
+      }).filter(([, v]) => v !== undefined && v !== null)
+    )
 
     const { data, error } = await supabase
       .from('properties')
-      .insert([
-        {
-          full_address,
-          address_line1,
-          address_line2,
-          city,
-          state,
-          postal_code,
-          lat,
-          lng,
-          owner_name,
-          owner_email
-        }
-      ])
+      .insert([insertPayload])
       .select('*')
       .single()
 
