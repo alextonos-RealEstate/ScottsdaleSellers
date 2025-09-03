@@ -2,6 +2,7 @@ import PortfolioOverview from '@/components/portfoliooverview'
 import StatCard from '@/components/statcard'
 import PropertyCard from '@/components/propertycard'
 import RecentSalesTable from '@/components/recentsalestable'
+import PropertyList from '@/components/property-list'
 import { sbServer } from '@/lib/server_supabase'
 
 export const revalidate = 30
@@ -59,6 +60,8 @@ export default async function DashboardPage() {
       </section>
 
       <RecentSalesTable data={(sales ?? []) as any} />
+
+      <PropertyList />
     </div>
   )
 }
