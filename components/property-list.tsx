@@ -67,7 +67,6 @@ export default function PropertyList() {
               </div>
             </div>
 
-            {/* 🔥 Big, obvious Open button */}
             <a
               href={`/property/${p.id}`}
               className="btn btn-secondary"
