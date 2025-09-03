@@ -67,10 +67,9 @@ export default function PropertyList() {
               </div>
             </div>
 
-            {/* 🔥 Big, obvious Open button */}
             <a
               href={`/property/${p.id}`}
-              className="px-4 py-2 rounded-lg border hover:bg-gray-50"
+              className="btn btn-secondary"
               aria-label={`Open property ${p.full_address || p.id}`}
             >
               Open
