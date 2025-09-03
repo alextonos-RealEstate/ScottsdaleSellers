@@ -24,7 +24,7 @@ export default function PropertyList() {
         const res = await fetch('/api/properties/recent', { cache: 'no-store' })
         const json = await res.json()
         if (!res.ok) throw new Error(json?.error || 'Failed to load properties')
-        setRows(json.properties || [])
+        setRows(json.properties ?? [])
       } catch (e: any) {
         setErr(e.message)
       } finally {
