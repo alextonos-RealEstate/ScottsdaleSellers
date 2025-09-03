@@ -29,37 +29,50 @@ export async function POST(req: Request) {
 
     const {
       full_address,
-      address_line1,
-      address_line2,
+      address,
       city,
       state = 'AZ',
       postal_code,
+      zip,
+      type,
+      beds,
+      baths,
+      sqft,
+      purchase_price,
+      purchase_date,
+      current_value,
       lat,
-      lng,
-      owner_name,
-      owner_email
+      lng
     } = body || {}
 
-    if (!full_address) {
-      return NextResponse.json({ error: 'full_address is required' }, { status: 400 })
+    const addressValue = full_address || address
+    const zipValue = postal_code || zip
+
+    if (!addressValue) {
+      return NextResponse.json({ error: 'address is required' }, { status: 400 })
     }
+
+    const insertPayload = Object.fromEntries(
+      Object.entries({
+        address: addressValue,
+        city,
+        state,
+        zip: zipValue,
+        type,
+        beds,
+        baths,
+        sqft,
+        purchase_price,
+        purchase_date,
+        current_value,
+        lat,
+        lng
+      }).filter(([, v]) => v !== undefined && v !== null)
+    )
 
     const { data, error } = await supabase
       .from('properties')
-      .insert([
-        {
-          full_address,
-          address_line1,
-          address_line2,
-          city,
-          state,
-          postal_code,
-          lat,
-          lng,
-          owner_name,
-          owner_email
-        }
-      ])
+      .insert([insertPayload])
       .select('*')
       .single()
 
